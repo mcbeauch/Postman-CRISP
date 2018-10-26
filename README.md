@@ -1,2 +1,2 @@
-# Immunization
-Immunizations microservice
+# Postman
+CRISP Postman Collections
