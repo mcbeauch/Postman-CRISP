@@ -1,0 +1,2509 @@
+{
+	"info": {
+		"_postman_id": "c3f6039d-2848-4841-9053-6f2d6bd262c2",
+		"name": "FHIR Regression - PROD",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Create Diagnostic Report",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "4177aa58-b5f0-4ca3-86e8-6a810ec5fd96",
+						"exec": [
+							"//check for 201/200",
+							"pm.test(\"Successful PUT\", function () {",
+							"    pm.expect(pm.response.code).to.be.oneOf([200,201]);",
+							"});",
+							"",
+							"",
+							"var resp = pm.response.json();",
+							"",
+							"//check that uuid is in response",
+							"pm.test(\"uuid returned\", function()",
+							"{",
+							"    if (resp.id !== '')",
+							"    {",
+							"        return true;",
+							"    }",
+							"    else",
+							"    {",
+							"        return false;",
+							"    }",
+							"});",
+							"",
+							"//save diagnostic report uuid ",
+							"pm.globals.set(\"dr_uuid\", resp.id);",
+							"",
+							"//check resource type",
+							"pm.test(\"resource type = DiagnosticReport\", function()",
+							"{",
+							"    if (resp.resourceType == 'DiagnosticReport')",
+							"    {",
+							"        return true;",
+							"    }",
+							"    else",
+							"    {",
+							"        return false;",
+							"    }",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "c21f243d-a3ed-41d1-a3e3-79944c651c7e",
+						"exec": [
+							"//diagnostic report id",
+							"pm.globals.set(\"dr_id\", 'GBMC|LAB99999|test_regression|test_regression2');",
+							"",
+							"//observation ids",
+							"pm.globals.set(\"obs1_id\", \"GBMC|LAB99999|test_regression|test_regression2|observation1\");",
+							"pm.globals.set(\"obs2_id\", \"GBMC|LAB99999|test_regression|test_regression2|observation2\");",
+							"",
+							"//specimen ids",
+							"pm.globals.set(\"spm1_id\", \"GBMC|LAB99999|test_regression|test_regression2|specimen1\");",
+							"pm.globals.set(\"spm2_id\", \"GBMC|LAB99999|test_regression|test_regression2|specimen2\");",
+							"",
+							"//medication id",
+							"pm.globals.set(\"medstat_id\", \"GBMC|LAB99999|test_regression_medstat\");"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Ocp-Apim-Subscription-Key",
+						"value": "9732cefd25c94ae1947154e55ac69d8d",
+						"disabled": true
+					},
+					{
+						"key": "Ocp-Apim-Trace",
+						"value": "true",
+						"disabled": true
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					},
+					{
+						"key": "CRISP-Certificate-Owner",
+						"value": "Devteam",
+						"disabled": true
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"resourceType\": \"DiagnosticReport\",\n    \"text\": {\n        \"status\": \"generated\",\n        \"div\": \"regression test - original create\"\n    },\n    \"contained\": [\n        {\n            \"resourceType\": \"ProcedureRequest\",\n            \"id\": \"req\"\n        }\n    ],\n    \"identifier\": [\n        {\n            \"use\": \"official\",\n            \"type\": {\n                \"text\": \"CRISP generated identifier: Facility|MRN|FillerNumber|Service Name\"\n            },\n            \"system\": \"https://crispapitest.azure-api.net/FHIR/DiagnosticReport\",\n            \"value\": \"{{dr_id}}\",\n            \"assigner\": {\n                \"display\": \"Chesapeake Regional Information Systems for our Patients\"\n            }\n        }\n    ],\n    \"status\": \"final\",\n    \"category\": {\n        \"coding\": [\n            {\n                \"system\": \"http://hl7.org/fhir/v2/0074\",\n                \"code\": \"LAB\"\n            }\n        ]\n    },\n    \"code\": {\n        \"coding\": [\n            {\n                \"system\": \"http://loinc.org\",\n                \"code\": \"9876\"\n            }\n        ]\n    },\n    \"subject\": {\n        \"display\": \"Labrador Retester\"\n    },\n    \"context\": {\n        \"reference\": \"Encounter/_testencounter1\"\n    },\n    \"effectiveDateTime\": \"2013-02-11T10:33:33.3330000Z\",\n    \"issued\": \"2013-03-11T09:28:00.0000000+00:00\",\n    \"performer\": [\n        {\n            \"actor\": {\n                \"reference\": \"Organization/testperformer\",\n                \"display\": \"GBMC\"\n            }\n        }\n    ],\n    \"specimen\": [\n        {\n            \"reference\": \"Specimen/{{spm1_id}}\"\n        },\n        {\n            \"reference\": \"Specimen/{{spm2_id}}\"\n        }\n    ],\n    \"result\": [\n        {\n            \"reference\": \"Observation/{{obs1_id}}\",\n            \"display\": \"regression observation 1\"\n        },\n        {\n            \"reference\": \"Observation/{{obs2_id}}\",\n            \"display\": \"regression observation 2\"\n        }\n    ]\n}"
+				},
+				"url": {
+					"raw": "{{regressionendpoint_dr}}",
+					"host": [
+						"{{regressionendpoint_dr}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Update Diagnostic Report",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "a6cd457a-10dd-40dc-8e6f-6cbcc5c123f9",
+						"exec": [
+							"//check for 201/200",
+							"pm.test(\"Successful PUT\", function () {",
+							"    pm.expect(pm.response.code).to.be.oneOf([200,201]);",
+							"});",
+							"",
+							"var resp = pm.response.json();",
+							"",
+							"//check that uuid is in response",
+							"pm.test(\"uuid returned\", function()",
+							"{",
+							"    if (resp.id !== '')",
+							"    {",
+							"        return true;",
+							"    }",
+							"    else",
+							"    {",
+							"        return false;",
+							"    }",
+							"});",
+							"",
+							"//check resource type",
+							"pm.test(\"resource type = DiagnosticReport\", function()",
+							"{",
+							"    if (resp.resourceType == 'DiagnosticReport')",
+							"    {",
+							"        return true;",
+							"    }",
+							"    else",
+							"    {",
+							"        return false;",
+							"    }",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Ocp-Apim-Subscription-Key",
+						"value": "9732cefd25c94ae1947154e55ac69d8d",
+						"disabled": true
+					},
+					{
+						"key": "Ocp-Apim-Trace",
+						"value": "true",
+						"disabled": true
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					},
+					{
+						"key": "CRISP-Certificate-Owner",
+						"value": "Devteam",
+						"disabled": true
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"resourceType\": \"DiagnosticReport\",\n    \"text\": {\n        \"status\": \"generated\",\n        \"div\": \"regression test - update\"\n    },\n    \"contained\": [\n        {\n            \"resourceType\": \"ProcedureRequest\",\n            \"id\": \"req\"\n        }\n    ],\n    \"identifier\": [\n        {\n            \"use\": \"official\",\n            \"type\": {\n                \"text\": \"CRISP generated identifier: Facility|MRN|FillerNumber|Service Name\"\n            },\n            \"system\": \"https://crispapitest.azure-api.net/FHIR/DiagnosticReport\",\n            \"value\": \"{{dr_id}}\",\n            \"assigner\": {\n                \"display\": \"Chesapeake Regional Information Systems for our Patients\"\n            }\n        }\n    ],\n    \"status\": \"final\",\n    \"category\": {\n        \"coding\": [\n            {\n                \"system\": \"http://hl7.org/fhir/v2/0074\",\n                \"code\": \"LAB\"\n            }\n        ]\n    },\n    \"code\": {\n        \"coding\": [\n            {\n                \"system\": \"http://loinc.org\",\n                \"code\": \"9876\"\n            }\n        ]\n    },\n    \"subject\": {\n        \"display\": \"Labrador Retester\"\n    },\n    \"context\": {\n        \"reference\": \"Encounter/_testencounter1\"\n    },\n    \"effectiveDateTime\": \"2013-02-11T10:33:33.3330000Z\",\n    \"issued\": \"2013-03-11T09:28:00.0000000+00:00\",\n    \"performer\": [\n        {\n            \"actor\": {\n                \"reference\": \"Organization/testperformer\",\n                \"display\": \"GBMC\"\n            }\n        }\n    ],\n    \"specimen\": [\n        {\n            \"reference\": \"Specimen/{{spm1_id}}\"\n        },\n        {\n            \"reference\": \"Specimen/{{spm2_id}}\"\n        }\n    ],\n    \"result\": [\n        {\n            \"reference\": \"Observation/{{obs1_id}}\",\n            \"display\": \"regression observation 1\"\n        },\n        {\n            \"reference\": \"Observation/{{obs2_id}}\",\n            \"display\": \"regression observation 2\"\n        }\n    ]\n}"
+				},
+				"url": {
+					"raw": "{{regressionendpoint_dr}}",
+					"host": [
+						"{{regressionendpoint_dr}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Create Diagnostic Report - BAD ID",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "a6cd457a-10dd-40dc-8e6f-6cbcc5c123f9",
+						"exec": [
+							"//check for 400",
+							"pm.test(\"400 Bad Request\", function () {",
+							"    pm.response.to.have.status(400);",
+							"});",
+							"",
+							"var resp = pm.response.json();",
+							"",
+							"",
+							"//check resource type",
+							"pm.test(\"resource type = OperationOutcome\", function()",
+							"{",
+							"    if (resp.resourceType == 'OperationOutcome')",
+							"    {",
+							"        return true;",
+							"    }",
+							"    else",
+							"    {",
+							"        return false;",
+							"    }",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Ocp-Apim-Subscription-Key",
+						"value": "9732cefd25c94ae1947154e55ac69d8d",
+						"disabled": true
+					},
+					{
+						"key": "Ocp-Apim-Trace",
+						"value": "true",
+						"disabled": true
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					},
+					{
+						"key": "CRISP-Certificate-Owner",
+						"value": "Devteam",
+						"disabled": true
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"resourceType\": \"DiagnosticReport\",\n    \"text\": {\n        \"status\": \"generated\",\n        \"div\": \"regression test - update\"\n    },\n    \"contained\": [\n        {\n            \"resourceType\": \"ProcedureRequest\",\n            \"id\": \"req\"\n        }\n    ],\n    \"identifier\": [\n        {\n            \"use\": \"official\",\n            \"type\": {\n                \"text\": \"CRISP generated identifier: Facility|MRN|FillerNumber|Service Name\"\n            },\n            \"system\": \"https://crispapitest.azure-api.net/FHIR/DiagnosticReport\",\n            \"value\": \"123\",\n            \"assigner\": {\n                \"display\": \"Chesapeake Regional Information Systems for our Patients\"\n            }\n        }\n    ],\n    \"status\": \"final\",\n    \"category\": {\n        \"coding\": [\n            {\n                \"system\": \"http://hl7.org/fhir/v2/0074\",\n                \"code\": \"LAB\"\n            }\n        ]\n    },\n    \"code\": {\n        \"coding\": [\n            {\n                \"system\": \"http://loinc.org\",\n                \"code\": \"9876\"\n            }\n        ]\n    },\n    \"subject\": {\n        \"display\": \"Labrador Retester\"\n    },\n    \"context\": {\n        \"reference\": \"Encounter/_testencounter1\"\n    },\n    \"effectiveDateTime\": \"2013-02-11T10:33:33.3330000Z\",\n    \"issued\": \"2013-03-11T09:28:00.0000000+00:00\",\n    \"performer\": [\n        {\n            \"actor\": {\n                \"reference\": \"Organization/testperformer\",\n                \"display\": \"GBMC\"\n            }\n        }\n    ],\n    \"specimen\": [\n        {\n            \"reference\": \"Specimen/GBMC|LAB99999|test_regression|testspecimen1\"\n        },\n        {\n            \"reference\": \"Specimen/GBMC|LAB99999|test_regression|testspecimen2\"\n        }\n    ],\n    \"result\": [\n        {\n            \"reference\": \"Observation/GBMC|LAB99999|test_regression|testobservation1\",\n            \"display\": \"regression observation 1\"\n        },\n        {\n            \"reference\": \"Observation/GBMC|LAB99999|test_regression|testobservation2\",\n            \"display\": \"regression observation 2\"\n        }\n    ]\n}"
+				},
+				"url": {
+					"raw": "{{regressionendpoint_dr}}",
+					"host": [
+						"{{regressionendpoint_dr}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get Diagnostic Report - /uuid",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "d6fc38a4-940f-43a7-ab6c-69b6f8c8c308",
+						"exec": [
+							"//check for 200",
+							"pm.test(\"Succesful GET\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"var resp = pm.response.json();",
+							"",
+							"//check that uuid is in response",
+							"pm.test(\"uuid returned\", function()",
+							"{",
+							"    if (resp.id !== '')",
+							"    {",
+							"        return true;",
+							"    }",
+							"    else",
+							"    {",
+							"        return false;",
+							"    }",
+							"});",
+							"",
+							"//check that resource type is correct ",
+							"pm.test(\"resource type = DiagnosticReport\", function()",
+							"{",
+							"    if (resp.resourceType == 'DiagnosticReport')",
+							"    {",
+							"        return true;",
+							"    }",
+							"    else",
+							"    {",
+							"        return false;",
+							"    }",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "{{regressionendpoint_dr}}{{dr_uuid}}?",
+					"host": [
+						"{{regressionendpoint_dr}}{{dr_uuid}}"
+					],
+					"query": [
+						{
+							"key": "code",
+							"value": "1",
+							"disabled": true
+						},
+						{
+							"key": "category",
+							"value": "LAB",
+							"disabled": true
+						},
+						{
+							"key": "date",
+							"value": "20160101",
+							"disabled": true
+						},
+						{
+							"key": "patient",
+							"value": "79559712",
+							"disabled": true
+						},
+						{
+							"key": "_id",
+							"value": "SJMC|SJ121209012|0906",
+							"disabled": true
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get Diagnostic Report - /uuid - BAD ID",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "d6fc38a4-940f-43a7-ab6c-69b6f8c8c308",
+						"exec": [
+							"//check for 200",
+							"pm.test(\"Bad Request (400)\", function () {",
+							"    pm.response.to.have.status(400);",
+							"});",
+							"",
+							"var resp = pm.response.json();",
+							"",
+							"//check that resource type is correct ",
+							"pm.test(\"resource type = OperationOutcome\", function()",
+							"{",
+							"    if (resp.resourceType == 'OperationOutcome')",
+							"    {",
+							"        return true;",
+							"    }",
+							"    else",
+							"    {",
+							"        return false;",
+							"    }",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "{{regressionendpoint_dr}}1234?",
+					"host": [
+						"{{regressionendpoint_dr}}1234"
+					],
+					"query": [
+						{
+							"key": "code",
+							"value": "1",
+							"disabled": true
+						},
+						{
+							"key": "category",
+							"value": "LAB",
+							"disabled": true
+						},
+						{
+							"key": "date",
+							"value": "20160101",
+							"disabled": true
+						},
+						{
+							"key": "patient",
+							"value": "79559712",
+							"disabled": true
+						},
+						{
+							"key": "_id",
+							"value": "SJMC|SJ121209012|0906",
+							"disabled": true
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get Diagnostic Report - /uuid - UNKNOWN ID",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "d6fc38a4-940f-43a7-ab6c-69b6f8c8c308",
+						"exec": [
+							"//check for 200",
+							"pm.test(\"Id Not Found (404)\", function () {",
+							"    pm.response.to.have.status(404);",
+							"});",
+							"",
+							"var resp = pm.response.json();",
+							"",
+							"//check that resource type is correct ",
+							"pm.test(\"resource type = OperationOutcome\", function()",
+							"{",
+							"    if (resp.resourceType == 'OperationOutcome')",
+							"    {",
+							"        return true;",
+							"    }",
+							"    else",
+							"    {",
+							"        return false;",
+							"    }",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "{{regressionendpoint_dr}}df2decaf-7f5c-496d-a9cc-d65076371223?",
+					"host": [
+						"{{regressionendpoint_dr}}df2decaf-7f5c-496d-a9cc-d65076371223"
+					],
+					"query": [
+						{
+							"key": "code",
+							"value": "1",
+							"disabled": true
+						},
+						{
+							"key": "category",
+							"value": "LAB",
+							"disabled": true
+						},
+						{
+							"key": "date",
+							"value": "20160101",
+							"disabled": true
+						},
+						{
+							"key": "patient",
+							"value": "79559712",
+							"disabled": true
+						},
+						{
+							"key": "_id",
+							"value": "SJMC|SJ121209012|0906",
+							"disabled": true
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get Diagnostic Report - ?_id=uuid",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "66361a1f-6602-4e47-b84e-1147a5ed854e",
+						"exec": [
+							"//check for 200",
+							"pm.test(\"Succesful GET\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"var resp = pm.response.json();",
+							"",
+							"//check that uuid is in response",
+							"pm.test(\"uuid returned\", function()",
+							"{",
+							"    if (resp.id !== '')",
+							"    {",
+							"        return true;",
+							"    }",
+							"    else",
+							"    {",
+							"        return false;",
+							"    }",
+							"});",
+							"",
+							"//check that resource type is correct ",
+							"pm.test(\"resource type = DiagnosticReport\", function()",
+							"{",
+							"    if (resp.resourceType == 'DiagnosticReport')",
+							"    {",
+							"        return true;",
+							"    }",
+							"    else",
+							"    {",
+							"        return false;",
+							"    }",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "{{regressionendpoint_dr}}?_id={{dr_uuid}}",
+					"host": [
+						"{{regressionendpoint_dr}}"
+					],
+					"query": [
+						{
+							"key": "code",
+							"value": "1",
+							"disabled": true
+						},
+						{
+							"key": "category",
+							"value": "LAB",
+							"disabled": true
+						},
+						{
+							"key": "date",
+							"value": "20160101",
+							"disabled": true
+						},
+						{
+							"key": "patient",
+							"value": "79559712",
+							"disabled": true
+						},
+						{
+							"key": "_id",
+							"value": "{{dr_uuid}}"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get Diagnostic Report - ?patient=eid",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "ca5fc5a5-1dd5-48c3-9f59-68662f5ef162",
+						"exec": [
+							"//check for 200",
+							"pm.test(\"Succesful GET\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"var resp = pm.response.json();",
+							"",
+							"//check that uuid is in response",
+							"pm.test(\"uuid returned\", function()",
+							"{",
+							"    if (resp.id !== '')",
+							"    {",
+							"        return true;",
+							"    }",
+							"    else",
+							"    {",
+							"        return false;",
+							"    }",
+							"});",
+							"",
+							"//check that resource type is correct ",
+							"pm.test(\"resource type = DiagnosticReport\", function()",
+							"{",
+							"    if (resp.resourceType == 'DiagnosticReport')",
+							"    {",
+							"        return true;",
+							"    }",
+							"    else",
+							"    {",
+							"        return false;",
+							"    }",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "{{regressionendpoint_dr}}?patient=79660309",
+					"host": [
+						"{{regressionendpoint_dr}}"
+					],
+					"query": [
+						{
+							"key": "code",
+							"value": "1",
+							"disabled": true
+						},
+						{
+							"key": "category",
+							"value": "LAB",
+							"disabled": true
+						},
+						{
+							"key": "date",
+							"value": "20160101",
+							"disabled": true
+						},
+						{
+							"key": "patient",
+							"value": "79660309"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get Diagnostic Report - ?patient=eid - BAD EID",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "ca5fc5a5-1dd5-48c3-9f59-68662f5ef162",
+						"exec": [
+							"//check for 200",
+							"pm.test(\"Succesful GET\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"var resp = pm.response.json();",
+							"",
+							"//check that resource type is correct ",
+							"pm.test(\"resource type = DiagnosticReport\", function()",
+							"{",
+							"    if (resp.resourceType == 'DiagnosticReport')",
+							"    {",
+							"        return true;",
+							"    }",
+							"    else",
+							"    {",
+							"        return false;",
+							"    }",
+							"});",
+							"",
+							"//check total",
+							"pm.test(\"total = 0\", function()",
+							"{",
+							"    if (resp.total == 0)",
+							"    {",
+							"        return true;",
+							"    }",
+							"    else",
+							"    {",
+							"        return false;",
+							"    }",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "{{regressionendpoint_dr}}?patient=123",
+					"host": [
+						"{{regressionendpoint_dr}}"
+					],
+					"query": [
+						{
+							"key": "code",
+							"value": "1",
+							"disabled": true
+						},
+						{
+							"key": "category",
+							"value": "LAB",
+							"disabled": true
+						},
+						{
+							"key": "date",
+							"value": "20160101",
+							"disabled": true
+						},
+						{
+							"key": "patient",
+							"value": "123"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Create Observation 1",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "566acc0a-3733-4ddf-888b-6c5537370d65",
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"id": "e78d7d74-4cf1-437f-bfbf-560772fcb02c",
+						"exec": [
+							"//check for 201",
+							"pm.test(\"Succesful POST\", function () {",
+							"    pm.response.to.have.status(201);",
+							"});",
+							"",
+							"var resp = pm.response.json();",
+							"",
+							"//check that uuid is in response",
+							"pm.test(\"uuid returned\", function()",
+							"{",
+							"    if (resp.id !== '')",
+							"    {",
+							"        return true;",
+							"    }",
+							"    else",
+							"    {",
+							"        return false;",
+							"    }",
+							"});",
+							"",
+							"//check resource type",
+							"pm.test(\"resource type = Observation\", function()",
+							"{",
+							"    if (resp.resourceType == 'Observation')",
+							"    {",
+							"        return true;",
+							"    }",
+							"    else",
+							"    {",
+							"        return false;",
+							"    }",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Ocp-Apim-Subscription-Key",
+						"value": "8630bcf9cf044163ae8a3c961f94ea82",
+						"disabled": true
+					},
+					{
+						"key": "Ocp-Apim-Trace",
+						"value": "true",
+						"disabled": true
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"resourceType\" : \"Observation\",\n  \"identifier\" : [\n    {\n      \"use\" : \"official\",\n      \"type\" : {\n        \"text\" : \"CRISP generated identifier: Facility|MRN|FillerNumber|Service Name|OBX Counter\"\n      },\n      \"system\" : \"https://testapi.crisphealth.org/FHIR/Observation/\",\n      \"value\" : \"{{obs1_id}}\",\n      \"assigner\" : {\n        \"display\" : \"Chesapeake Regional Information Systems for our Patients\"\n      }\n    }\n  ],\n  \"meta\" : {\n    \"profile\" : [\n      \"http://fhir.org/guides/argonaut/StructureDefinition/argo-observationresults\"\n    ]\n  },\n  \"status\" : \"final\",\n  \"category\" : [\n    {\n      \"coding\" : [\n        {\n          \"system\" : \"http://hl7.org/fhir/observation-category\",\n          \"code\" : \"laboratory\",\n          \"display\" : \"Laboratory\"\n        }\n      ],\n      \"text\" : \"Laboratory\"\n    }\n  ],\n  \"code\" : {\n    \"coding\" : [\n      {\n        \"system\" : \"http://loinc.org\",\n        \"code\" : \"123-1\",\n        \"display\" : \"test loinc 123-1\"\n      }\n    ]\n  },\n  \"subject\" : {\n    \"display\" : \"Labrador Retester\"\n  },\n  \"effectiveDateTime\" : \"2018-09-24\",\n  \"valueString\" : \"valueString\"\n}"
+				},
+				"url": {
+					"raw": "{{regressionendpoint_obs}}",
+					"host": [
+						"{{regressionendpoint_obs}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Create Observation 2",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "f6e7e1be-de50-463a-a39c-e9363ddb05af",
+						"exec": [
+							"//check for 201",
+							"pm.test(\"Succesful POST\", function () {",
+							"    pm.response.to.have.status(201);",
+							"});",
+							"",
+							"var resp = pm.response.json();",
+							"",
+							"//check that uuid is in response",
+							"pm.test(\"uuid returned\", function()",
+							"{",
+							"    if (resp.id !== '')",
+							"    {",
+							"        return true;",
+							"    }",
+							"    else",
+							"    {",
+							"        return false;",
+							"    }",
+							"});",
+							"",
+							"pm.globals.set(\"obs_uuid\", resp.id);",
+							"",
+							"//check resource type",
+							"pm.test(\"resource type = Observation\", function()",
+							"{",
+							"    if (resp.resourceType == 'Observation')",
+							"    {",
+							"        return true;",
+							"    }",
+							"    else",
+							"    {",
+							"        return false;",
+							"    }",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Ocp-Apim-Subscription-Key",
+						"value": "8630bcf9cf044163ae8a3c961f94ea82",
+						"disabled": true
+					},
+					{
+						"key": "Ocp-Apim-Trace",
+						"value": "true",
+						"disabled": true
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"resourceType\" : \"Observation\",\n  \"identifier\" : [\n    {\n      \"use\" : \"official\",\n      \"type\" : {\n        \"text\" : \"CRISP generated identifier: Facility|MRN|FillerNumber|Service Name|OBX Counter\"\n      },\n      \"system\" : \"https://testapi.crisphealth.org/FHIR/Observation/\",\n      \"value\" : \"{{obs2_id}}\",\n      \"assigner\" : {\n        \"display\" : \"Chesapeake Regional Information Systems for our Patients\"\n      }\n    }\n  ],\n  \"meta\" : {\n    \"profile\" : [\n      \"http://fhir.org/guides/argonaut/StructureDefinition/argo-observationresults\"\n    ]\n  },\n  \"status\" : \"final\",\n  \"category\" : [\n    {\n      \"coding\" : [\n        {\n          \"system\" : \"http://hl7.org/fhir/observation-category\",\n          \"code\" : \"laboratory\",\n          \"display\" : \"Laboratory\"\n        }\n      ],\n      \"text\" : \"Laboratory\"\n    }\n  ],\n  \"code\" : {\n    \"coding\" : [\n      {\n        \"system\" : \"http://loinc.org\",\n        \"code\" : \"123-1\",\n        \"display\" : \"test loinc 123-1\"\n      }\n    ]\n  },\n  \"subject\" : {\n    \"display\" : \"Labrador Retester\"\n  },\n  \"effectiveDateTime\" : \"2018-09-24\",\n  \"valueString\" : \"valueString\"\n}"
+				},
+				"url": {
+					"raw": "{{regressionendpoint_obs}}",
+					"host": [
+						"{{regressionendpoint_obs}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get Observation - /uuid",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "b8ae733c-66a7-4570-b452-e055053982f7",
+						"exec": [
+							"//check for 200",
+							"pm.test(\"Succesful GET\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"",
+							"var resp = pm.response.json();",
+							"",
+							"//check that uuid is in response",
+							"pm.test(\"uuid returned\", function()",
+							"{",
+							"    if (resp.id !== '')",
+							"    {",
+							"        return true;",
+							"    }",
+							"    else",
+							"    {",
+							"        return false;",
+							"    }",
+							"});",
+							"",
+							"//check that resource type is correct ",
+							"pm.test(\"resource type = Observation\", function()",
+							"{",
+							"    if (resp.resourceType == 'Observation')",
+							"    {",
+							"        return true;",
+							"    }",
+							"    else",
+							"    {",
+							"        return false;",
+							"    }",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Ocp-Apim-Subscription-Key",
+						"value": "8630bcf9cf044163ae8a3c961f94ea82",
+						"disabled": true
+					},
+					{
+						"key": "Ocp-Apim-Trace",
+						"value": "true",
+						"disabled": true
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "{{regressionendpoint_obr}}{{obs_uuid}}?",
+					"host": [
+						"{{regressionendpoint_obr}}{{obs_uuid}}"
+					],
+					"query": [
+						{
+							"key": "_id",
+							"value": "",
+							"disabled": true
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get Observation - /uuid - BAD ID",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "d6fc38a4-940f-43a7-ab6c-69b6f8c8c308",
+						"exec": [
+							"//check for 200",
+							"pm.test(\"Id Not Found (404)\", function () {",
+							"    pm.response.to.have.status(404);",
+							"});",
+							"",
+							"var resp = pm.response.json();",
+							"",
+							"//check that resource type is correct ",
+							"pm.test(\"resource type = OperationOutcome\", function()",
+							"{",
+							"    if (resp.resourceType == 'OperationOutcome')",
+							"    {",
+							"        return true;",
+							"    }",
+							"    else",
+							"    {",
+							"        return false;",
+							"    }",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "{{regressionendpoint_obs}}1234?",
+					"host": [
+						"{{regressionendpoint_obs}}1234"
+					],
+					"query": [
+						{
+							"key": "code",
+							"value": "1",
+							"disabled": true
+						},
+						{
+							"key": "category",
+							"value": "LAB",
+							"disabled": true
+						},
+						{
+							"key": "date",
+							"value": "20160101",
+							"disabled": true
+						},
+						{
+							"key": "patient",
+							"value": "79559712",
+							"disabled": true
+						},
+						{
+							"key": "_id",
+							"value": "SJMC|SJ121209012|0906",
+							"disabled": true
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get All Observations - /id",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "50d5f051-bfc1-42af-88a7-887407176de8",
+						"exec": [
+							"//check for 200",
+							"pm.test(\"Succesful GET\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"var resp = pm.response.json();",
+							"",
+							"//check that resource type is correct ",
+							"pm.test(\"resource type = Bundle\", function()",
+							"{",
+							"    if (resp.resourceType == 'Bundle')",
+							"    {",
+							"        return true;",
+							"    }",
+							"    else",
+							"    {",
+							"        return false;",
+							"    }",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Ocp-Apim-Subscription-Key",
+						"value": "8630bcf9cf044163ae8a3c961f94ea82",
+						"disabled": true
+					},
+					{
+						"key": "Ocp-Apim-Trace",
+						"value": "true",
+						"disabled": true
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "{{regressionendpoint_obs}}getall/{{dr_id}}",
+					"host": [
+						"{{regressionendpoint_obs}}getall"
+					],
+					"path": [
+						"{{dr_id}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Create Specimen 1",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "48f4c8f2-293d-4f0b-814a-881e054734ae",
+						"exec": [
+							"//check for 201",
+							"pm.test(\"Succesful POST\", function () {",
+							"    pm.response.to.have.status(201);",
+							"});",
+							"",
+							"var resp = pm.response.json();",
+							"",
+							"//check that uuid is in response",
+							"pm.test(\"uuid returned\", function()",
+							"{",
+							"    if (resp.id !== '')",
+							"    {",
+							"        return true;",
+							"    }",
+							"    else",
+							"    {",
+							"        return false;",
+							"    }",
+							"});",
+							"",
+							"//check resource type",
+							"pm.test(\"resource type = Specimen\", function()",
+							"{",
+							"    if (resp.resourceType == 'Specimen')",
+							"    {",
+							"        return true;",
+							"    }",
+							"    else",
+							"    {",
+							"        return false;",
+							"    }",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					},
+					{
+						"key": "Ocp-Apim-Subscription-Key",
+						"value": "9732cefd25c94ae1947154e55ac69d8d",
+						"disabled": true
+					},
+					{
+						"key": "Ocp-Apim-Trace",
+						"value": "true",
+						"disabled": true
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"resourceType\": \"Specimen\",\n    \"text\": {\n        \"status\": \"generated\",\n        \"div\": \"test regression specimen\"\n    },\n    \"contained\": [\n        {\n            \"resourceType\": \"Substance\",\n            \"id\": \"123\"\n        }\n    ],\n    \"identifier\": [\n        {\n            \"system\": \"http://ehr.acme.org/identifiers/collections\",\n            \"value\": \"{{spm1_id}}\"\n        }\n    ],\n    \"status\": \"available\",\n    \"type\": {\n        \"coding\": [\n            {\n                \"system\": \"http://snomed.info/sct\",\n                \"code\": \"122555007\",\n                \"display\": \"Venous blood specimen\"\n            }\n        ]\n    },\n    \"subject\": {\n        \"display\": \"Labrador Retester\"\n    },\n    \n    \"note\": [\n        {\n            \"text\": \"test regression\"\n        }\n    ]\n}"
+				},
+				"url": {
+					"raw": "{{regressionendpoint_spm}}",
+					"host": [
+						"{{regressionendpoint_spm}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Create Specimen 2",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "5cc9f2fc-9d71-4349-8c3c-315062ab4949",
+						"exec": [
+							"//check for 201",
+							"pm.test(\"Succesful POST\", function () {",
+							"    pm.response.to.have.status(201);",
+							"});",
+							"",
+							"var resp = pm.response.json();",
+							"",
+							"//check that uuid is in response",
+							"pm.test(\"uuid returned\", function()",
+							"{",
+							"    if (resp.id !== '')",
+							"    {",
+							"        return true;",
+							"    }",
+							"    else",
+							"    {",
+							"        return false;",
+							"    }",
+							"});",
+							"",
+							"pm.globals.set(\"spm_uuid\", resp.id);",
+							"",
+							"//check resource type",
+							"pm.test(\"resource type = Specimen\", function()",
+							"{",
+							"    if (resp.resourceType == 'Specimen')",
+							"    {",
+							"        return true;",
+							"    }",
+							"    else",
+							"    {",
+							"        return false;",
+							"    }",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					},
+					{
+						"key": "Ocp-Apim-Subscription-Key",
+						"value": "9732cefd25c94ae1947154e55ac69d8d",
+						"disabled": true
+					},
+					{
+						"key": "Ocp-Apim-Trace",
+						"value": "true",
+						"disabled": true
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"resourceType\": \"Specimen\",\n    \"text\": {\n        \"status\": \"generated\",\n        \"div\": \"test regression specimen\"\n    },\n    \"contained\": [\n        {\n            \"resourceType\": \"Substance\",\n            \"id\": \"123\"\n        }\n    ],\n    \"identifier\": [\n        {\n            \"system\": \"http://ehr.acme.org/identifiers/collections\",\n            \"value\": \"{{spm2_id}}\"\n        }\n    ],\n    \"status\": \"available\",\n    \"type\": {\n        \"coding\": [\n            {\n                \"system\": \"http://snomed.info/sct\",\n                \"code\": \"122555007\",\n                \"display\": \"Venous blood specimen\"\n            }\n        ]\n    },\n    \"subject\": {\n        \"display\": \"Labrador Retester\"\n    },\n    \n    \"note\": [\n        {\n            \"text\": \"test regression\"\n        }\n    ]\n}"
+				},
+				"url": {
+					"raw": "{{regressionendpoint_spm}}",
+					"host": [
+						"{{regressionendpoint_spm}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get Specimen - /uuid",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "67bab148-7102-4ea8-b5a9-d761057fcbc6",
+						"exec": [
+							"//check for 200",
+							"pm.test(\"Succesful GET\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"var resp = pm.response.json();",
+							"",
+							"//check that uuid is in response",
+							"pm.test(\"uuid returned\", function()",
+							"{",
+							"    if (resp.id !== '')",
+							"    {",
+							"        return true;",
+							"    }",
+							"    else",
+							"    {",
+							"        return false;",
+							"    }",
+							"});",
+							"",
+							"//check that resource type is correct ",
+							"pm.test(\"resource type = Specimen\", function()",
+							"{",
+							"    if (resp.resourceType == 'Specimen')",
+							"    {",
+							"        return true;",
+							"    }",
+							"    else",
+							"    {",
+							"        return false;",
+							"    }",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Ocp-Apim-Subscription-Key",
+						"value": "8630bcf9cf044163ae8a3c961f94ea82",
+						"disabled": true
+					},
+					{
+						"key": "Ocp-Apim-Trace",
+						"value": "true",
+						"disabled": true
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "{{regressionendpoint_spm}}{{spm_uuid}}?",
+					"host": [
+						"{{regressionendpoint_spm}}{{spm_uuid}}"
+					],
+					"query": [
+						{
+							"key": "_id",
+							"value": "",
+							"disabled": true
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get Specimen - /uuid - BAD ID",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "d6fc38a4-940f-43a7-ab6c-69b6f8c8c308",
+						"exec": [
+							"//check for 200",
+							"pm.test(\"Id Not Found (404)\", function () {",
+							"    pm.response.to.have.status(404);",
+							"});",
+							"",
+							"var resp = pm.response.json();",
+							"",
+							"//check that resource type is correct ",
+							"pm.test(\"resource type = OperationOutcome\", function()",
+							"{",
+							"    if (resp.resourceType == 'OperationOutcome')",
+							"    {",
+							"        return true;",
+							"    }",
+							"    else",
+							"    {",
+							"        return false;",
+							"    }",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "{{regressionendpoint_spm}}1234?",
+					"host": [
+						"{{regressionendpoint_spm}}1234"
+					],
+					"query": [
+						{
+							"key": "code",
+							"value": "1",
+							"disabled": true
+						},
+						{
+							"key": "category",
+							"value": "LAB",
+							"disabled": true
+						},
+						{
+							"key": "date",
+							"value": "20160101",
+							"disabled": true
+						},
+						{
+							"key": "patient",
+							"value": "79559712",
+							"disabled": true
+						},
+						{
+							"key": "_id",
+							"value": "SJMC|SJ121209012|0906",
+							"disabled": true
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get All Specimens - /id",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "bfcf871e-4e21-4804-9e7c-867d5cede536",
+						"exec": [
+							"//check for 200",
+							"pm.test(\"Succesful GET\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"var resp = pm.response.json();",
+							"",
+							"//check that resource type is correct ",
+							"pm.test(\"resource type = Bundle\", function()",
+							"{",
+							"    if (resp.resourceType == 'Bundle')",
+							"    {",
+							"        return true;",
+							"    }",
+							"    else",
+							"    {",
+							"        return false;",
+							"    }",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Ocp-Apim-Subscription-Key",
+						"value": "8630bcf9cf044163ae8a3c961f94ea82",
+						"disabled": true
+					},
+					{
+						"key": "Ocp-Apim-Trace",
+						"value": "true",
+						"disabled": true
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "{{regressionendpoint_spm}}getall/{{dr_id}}",
+					"host": [
+						"{{regressionendpoint_spm}}getall"
+					],
+					"path": [
+						"{{dr_id}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get Diagnostic Report - ?_id=uuid & _include",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "732b5904-889a-45db-8aee-f2397ca6057a",
+						"exec": [
+							"//check for 200",
+							"pm.test(\"Succesful GET\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"var resp = pm.response.json();",
+							"",
+							"//check that resource type is correct ",
+							"pm.test(\"resource type = Bundle\", function()",
+							"{",
+							"    if (resp.resourceType == 'Bundle')",
+							"    {",
+							"        return true;",
+							"    }",
+							"    else",
+							"    {",
+							"        return false;",
+							"    }",
+							"});",
+							"",
+							"//check total",
+							"pm.test(\"total = 5\", function()",
+							"{",
+							"    if (resp.total == 5)",
+							"    {",
+							"        return true;",
+							"    }",
+							"    else",
+							"    {",
+							"        return false;",
+							"    }",
+							"});",
+							"",
+							"//check that first resource is the diagnostic",
+							"pm.test(\"first resource type = DiagnosticReport\", function()",
+							"{",
+							"    var r1 = resp.entry[0].resource;",
+							"    ",
+							"    if (r1.resourceType == 'DiagnosticReport')",
+							"    {",
+							"        return true;",
+							"    }",
+							"    else",
+							"    {",
+							"        return false;",
+							"    }",
+							"});",
+							"",
+							"//check that first resource is the diagnostic",
+							"pm.test(\"first search mode = match\", function()",
+							"{",
+							"    var r1s = resp.entry[0].search;",
+							"    ",
+							"    if (r1s.search == 'match')",
+							"    {",
+							"        return true;",
+							"    }",
+							"    else",
+							"    {",
+							"        return false;",
+							"    }",
+							"});",
+							"",
+							"//check that next resources are the observations",
+							"pm.test(\"2nd and 3rd resource types = Observation\", function()",
+							"{",
+							"    var r2 = resp.entry[1].resource;",
+							"    var r3 = resp.entry[2].resource;",
+							"    ",
+							"    if ( (r2.resourceType == 'Observation') && (r3.resourceType == 'Observation') )",
+							"    {",
+							"        return true;",
+							"    }",
+							"    else",
+							"    {",
+							"        return false;",
+							"    }",
+							"});",
+							"",
+							"//check that next resources are the specimens",
+							"pm.test(\"4th and 5th resource types = Specimen\", function()",
+							"{",
+							"    var r4 = resp.entry[1].resource;",
+							"    var r5 = resp.entry[2].resource;",
+							"    ",
+							"    if ( (r4.resourceType == 'Specimen') && (r5.resourceType == 'Specimen') )",
+							"    {",
+							"        return true;",
+							"    }",
+							"    else",
+							"    {",
+							"        return false;",
+							"    }",
+							"});",
+							"",
+							"//check that next resources are the observations",
+							"pm.test(\"All other search modes = include\", function()",
+							"{",
+							"    for (var i=1; i<resp.entry; i++)",
+							"    {",
+							"        if (resp.entry[i].search != 'include')",
+							"        {",
+							"            return false;",
+							"        }",
+							"        else ",
+							"        {",
+							"            return true;",
+							"        }",
+							"    }",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "{{regressionendpoint_dr}}?_id={{dr_uuid}}&_include=DiagnosticReport:result&_include=DiagnosticReport:specimen",
+					"host": [
+						"{{regressionendpoint_dr}}"
+					],
+					"query": [
+						{
+							"key": "code",
+							"value": "1",
+							"disabled": true
+						},
+						{
+							"key": "category",
+							"value": "LAB",
+							"disabled": true
+						},
+						{
+							"key": "date",
+							"value": "20160101",
+							"disabled": true
+						},
+						{
+							"key": "patient",
+							"value": "79559712",
+							"disabled": true
+						},
+						{
+							"key": "_id",
+							"value": "{{dr_uuid}}"
+						},
+						{
+							"key": "_include",
+							"value": "DiagnosticReport:result"
+						},
+						{
+							"key": "_include",
+							"value": "DiagnosticReport:specimen"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Create Medication",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "35ea1371-4cd1-4806-a21a-0a1afe4321e5",
+						"exec": [
+							"//check for 201/200",
+							"pm.test(\"Successful PUT\", function () {",
+							"    pm.expect(pm.response.code).to.be.oneOf([200,201]);",
+							"});",
+							"",
+							"var resp = pm.response.json();",
+							"",
+							"//check that uuid is in response",
+							"pm.test(\"uuid returned\", function()",
+							"{",
+							"    if (resp.id !== '')",
+							"    {",
+							"        return true;",
+							"    }",
+							"    else",
+							"    {",
+							"        return false;",
+							"    }",
+							"});",
+							"",
+							"//check resource type",
+							"pm.test(\"resource type = MedicationStatement\", function()",
+							"{",
+							"    if (resp.resourceType == 'MedicationStatement')",
+							"    {",
+							"        return true;",
+							"    }",
+							"    else",
+							"    {",
+							"        return false;",
+							"    }",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					},
+					{
+						"key": "Ocp-Apim-Subscription-Key",
+						"value": "9732cefd25c94ae1947154e55ac69d8d",
+						"disabled": true
+					},
+					{
+						"key": "Ocp-Apim-Trace",
+						"value": "true",
+						"disabled": true
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"ResourceType\": \"MedicationStatement\",\n    \"subject\": {\n        \"reference\": \"Patient/Labrador Retester\",\n        \"display\": \"Labrador Retester\"\n    },\n    \"status\":\"active\",\n    \"taken\": \"y\",\n    \"medicationCodeableConcept\":\n    {\n        \"coding\": [\n            {\n                \"code\": \"code\",\n                \"display\": \"display\"    \n            }\n        ]    \n    },\n    \"dateAsserted\": \"2018-10-17\",\n    \"Identifier\": [\n        {\n            \"use\": \"official\",\n            \"type\": {\n                \"text\": \"CRISP generated identifier: Facility|MRN|CCD\"\n            },\n            \"system\": \"https://crispapitest.azure-api.net/FHIR/Medications\",\n            \"value\": \"{{medstat_id}}\",\n            \"assigner\": {\n                \"display\": \"Chesapeake Regional Information Systems for our Patients\"\n            }\n        }\n    ],\n\t\"medicationReference\": \n\t{\n    \t\"reference\" : \"#med1\",\n    \t\"display\" : \"lisinopril oral 10 mg\"\n\t}\n}"
+				},
+				"url": {
+					"raw": "{{regressionendpoint_medstat}}",
+					"host": [
+						"{{regressionendpoint_medstat}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Update Medication",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "889310a2-9f53-4222-bd64-314c76b470bb",
+						"exec": [
+							"//check for 201/200",
+							"pm.test(\"Successful PUT\", function () {",
+							"    pm.expect(pm.response.code).to.be.oneOf([200,201]);",
+							"});",
+							"",
+							"var resp = pm.response.json();",
+							"",
+							"//check that uuid is in response",
+							"pm.test(\"uuid returned\", function()",
+							"{",
+							"    if (resp.id !== '')",
+							"    {",
+							"        return true;",
+							"    }",
+							"    else",
+							"    {",
+							"        return false;",
+							"    }",
+							"});",
+							"",
+							"pm.globals.set(\"medstat_uuid\", resp.id);",
+							"",
+							"//check resource type",
+							"pm.test(\"resource type = MedicationStatement\", function()",
+							"{",
+							"    if (resp.resourceType == 'MedicationStatement')",
+							"    {",
+							"        return true;",
+							"    }",
+							"    else",
+							"    {",
+							"        return false;",
+							"    }",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					},
+					{
+						"key": "Ocp-Apim-Subscription-Key",
+						"value": "9732cefd25c94ae1947154e55ac69d8d",
+						"disabled": true
+					},
+					{
+						"key": "Ocp-Apim-Trace",
+						"value": "true",
+						"disabled": true
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"ResourceType\": \"MedicationStatement\",\n    \"subject\": {\n        \"reference\": \"Patient/Labrador Retester\",\n        \"display\": \"Labrador Retester\"\n    },\n    \"status\":\"active\",\n    \"taken\": \"y\",\n    \"medicationCodeableConcept\":\n    {\n        \"coding\": [\n            {\n                \"code\": \"code\",\n                \"display\": \"display\"    \n            }\n        ]    \n    },\n    \"dateAsserted\": \"2018-10-17\",\n    \"Identifier\": [\n        {\n            \"use\": \"official\",\n            \"type\": {\n                \"text\": \"CRISP generated identifier: Facility|MRN|CCD\"\n            },\n            \"system\": \"https://crispapitest.azure-api.net/FHIR/Medications\",\n            \"value\": \"{{medstat_id}}\",\n            \"assigner\": {\n                \"display\": \"Chesapeake Regional Information Systems for our Patients\"\n            }\n        }\n    ],\n\t\"medicationReference\": \n\t{\n    \t\"reference\" : \"#med1_update\",\n    \t\"display\" : \"lisinopril oral 10 mg\"\n\t}\n}"
+				},
+				"url": {
+					"raw": "{{regressionendpoint_medstat}}",
+					"host": [
+						"{{regressionendpoint_medstat}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Delete One Observation",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "e2d4a275-2622-434f-8006-b33fc6d3719a",
+						"exec": [
+							"//check for 200",
+							"pm.test(\"Succesful DELETE\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "DELETE",
+				"header": [
+					{
+						"key": "Ocp-Apim-Subscription-Key",
+						"value": "8630bcf9cf044163ae8a3c961f94ea82",
+						"disabled": true
+					},
+					{
+						"key": "Ocp-Apim-Trace",
+						"value": "true",
+						"disabled": true
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "{{regressionendpoint_obs}}{{obs_uuid}}",
+					"host": [
+						"{{regressionendpoint_obs}}{{obs_uuid}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Delete One Observation - UNKNOWN ID",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "e2d4a275-2622-434f-8006-b33fc6d3719a",
+						"exec": [
+							"//check for 200",
+							"pm.test(\"ID not found (404)\", function () {",
+							"    pm.response.to.have.status(404);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "DELETE",
+				"header": [
+					{
+						"key": "Ocp-Apim-Subscription-Key",
+						"value": "8630bcf9cf044163ae8a3c961f94ea82",
+						"disabled": true
+					},
+					{
+						"key": "Ocp-Apim-Trace",
+						"value": "true",
+						"disabled": true
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "{{regressionendpoint_obs}}df2decaf-7f5c-496d-a9cc-d65076371223",
+					"host": [
+						"{{regressionendpoint_obs}}df2decaf-7f5c-496d-a9cc-d65076371223"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Delete ALL Observations",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "473c341c-24da-4d5c-bfb9-dcbe1b7972f0",
+						"exec": [
+							"//check for 200",
+							"pm.test(\"Succesful DELETE\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "DELETE",
+				"header": [
+					{
+						"key": "Ocp-Apim-Subscription-Key",
+						"value": "8630bcf9cf044163ae8a3c961f94ea82"
+					},
+					{
+						"key": "Ocp-Apim-Trace",
+						"value": "true"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "{{regressionendpoint_obs}}DeleteAll/{{dr_id}}",
+					"host": [
+						"{{regressionendpoint_obs}}DeleteAll"
+					],
+					"path": [
+						"{{dr_id}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Delete One Specimen",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "5404aa32-acfd-4b11-bc01-7eb9a993cf61",
+						"exec": [
+							"//check for 200",
+							"pm.test(\"Succesful DELETE\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "DELETE",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {},
+				"url": {
+					"raw": "{{regressionendpoint_spm}}{{spm_uuid}}",
+					"host": [
+						"{{regressionendpoint_spm}}{{spm_uuid}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Delete One Specimen - UNKNOWN ID",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "e2d4a275-2622-434f-8006-b33fc6d3719a",
+						"exec": [
+							"//check for 200",
+							"pm.test(\"ID not found (404)\", function () {",
+							"    pm.response.to.have.status(404);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "DELETE",
+				"header": [
+					{
+						"key": "Ocp-Apim-Subscription-Key",
+						"value": "8630bcf9cf044163ae8a3c961f94ea82",
+						"disabled": true
+					},
+					{
+						"key": "Ocp-Apim-Trace",
+						"value": "true",
+						"disabled": true
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "{{regressionendpoint_spm}}df2decaf-7f5c-496d-a9cc-d65076371223",
+					"host": [
+						"{{regressionendpoint_spm}}df2decaf-7f5c-496d-a9cc-d65076371223"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Delete ALL Specimens",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "d4e185e2-6153-4e35-9ab9-896d92a9cea0",
+						"exec": [
+							"//check for 200",
+							"pm.test(\"Succesful DELETE\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "DELETE",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {},
+				"url": {
+					"raw": "{{regressionendpoint_spm}}/deleteall/{{dr_id}}",
+					"host": [
+						"{{regressionendpoint_spm}}"
+					],
+					"path": [
+						"deleteall",
+						"{{dr_id}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Delete Diagnostic Report",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "dd94e564-3a55-44ea-949a-9cd853022042",
+						"exec": [
+							"//check for 200",
+							"pm.test(\"Succesful DELETE\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "DELETE",
+				"header": [
+					{
+						"key": "Ocp-Apim-Subscription-Key",
+						"value": "9732cefd25c94ae1947154e55ac69d8d",
+						"disabled": true
+					},
+					{
+						"key": "Ocp-Apim-Trace",
+						"value": "true",
+						"disabled": true
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "{{regressionendpoint_dr}}{{dr_uuid}}",
+					"host": [
+						"{{regressionendpoint_dr}}{{dr_uuid}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Delete Diagnostic Report - UNKNOWN ID",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "e2d4a275-2622-434f-8006-b33fc6d3719a",
+						"exec": [
+							"//check for 200",
+							"pm.test(\"ID not found (404)\", function () {",
+							"    pm.response.to.have.status(404);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "DELETE",
+				"header": [
+					{
+						"key": "Ocp-Apim-Subscription-Key",
+						"value": "8630bcf9cf044163ae8a3c961f94ea82",
+						"disabled": true
+					},
+					{
+						"key": "Ocp-Apim-Trace",
+						"value": "true",
+						"disabled": true
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "{{regressionendpoint_dr}}df2decaf-7f5c-496d-a9cc-d65076371223",
+					"host": [
+						"{{regressionendpoint_dr}}df2decaf-7f5c-496d-a9cc-d65076371223"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Delete One Medication",
+			"request": {
+				"method": "DELETE",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					},
+					{
+						"key": "Ocp-Apim-Subscription-Key",
+						"value": "9732cefd25c94ae1947154e55ac69d8d",
+						"disabled": true
+					},
+					{
+						"key": "Ocp-Apim-Trace",
+						"value": "true",
+						"disabled": true
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "{{regressionendpoint_medstat}}{{medstat_uuid}}",
+					"host": [
+						"{{regressionendpoint_medstat}}{{medstat_uuid}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get Diagnostic Report - /uuid",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "d6fc38a4-940f-43a7-ab6c-69b6f8c8c308",
+						"exec": [
+							"//check for 404",
+							"pm.test(\"DR was successfully deleted\", function () {",
+							"    pm.response.to.have.status(404);",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "{{regressionendpoint_dr}}{{dr_uuid}}?",
+					"host": [
+						"{{regressionendpoint_dr}}{{dr_uuid}}"
+					],
+					"query": [
+						{
+							"key": "code",
+							"value": "1",
+							"disabled": true
+						},
+						{
+							"key": "category",
+							"value": "LAB",
+							"disabled": true
+						},
+						{
+							"key": "date",
+							"value": "20160101",
+							"disabled": true
+						},
+						{
+							"key": "patient",
+							"value": "79559712",
+							"disabled": true
+						},
+						{
+							"key": "_id",
+							"value": "SJMC|SJ121209012|0906",
+							"disabled": true
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get All Observations - /id",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "50d5f051-bfc1-42af-88a7-887407176de8",
+						"exec": [
+							"//check for 200",
+							"pm.test(\"Succesful GET\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"var resp = pm.response.json();",
+							"",
+							"//check that resource type is correct ",
+							"pm.test(\"resource type = Bundle\", function()",
+							"{",
+							"    if (resp.resourceType == 'Bundle')",
+							"    {",
+							"        return true;",
+							"    }",
+							"    else",
+							"    {",
+							"        return false;",
+							"    }",
+							"});",
+							"",
+							"//check total",
+							"pm.test(\"Observations were deleted (Bundle is empty)\", function()",
+							"{",
+							"    if (resp.total === 0)",
+							"    {",
+							"        return true;",
+							"    }",
+							"    else",
+							"    {",
+							"        return false;",
+							"    }",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Ocp-Apim-Subscription-Key",
+						"value": "8630bcf9cf044163ae8a3c961f94ea82",
+						"disabled": true
+					},
+					{
+						"key": "Ocp-Apim-Trace",
+						"value": "true",
+						"disabled": true
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "{{regressionendpoint_obs}}getall/{{dr_id}}",
+					"host": [
+						"{{regressionendpoint_obs}}getall"
+					],
+					"path": [
+						"{{dr_id}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get All Specimens - /id",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "bfcf871e-4e21-4804-9e7c-867d5cede536",
+						"exec": [
+							"//check for 200",
+							"pm.test(\"Succesful GET\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"var resp = pm.response.json();",
+							"",
+							"//check that resource type is correct ",
+							"pm.test(\"resource type = Bundle\", function()",
+							"{",
+							"    if (resp.resourceType == 'Bundle')",
+							"    {",
+							"        return true;",
+							"    }",
+							"    else",
+							"    {",
+							"        return false;",
+							"    }",
+							"});",
+							"",
+							"//check total",
+							"pm.test(\"Specimens were deleted (Bundle is empty)\", function()",
+							"{",
+							"    if (resp.total === 0)",
+							"    {",
+							"        return true;",
+							"    }",
+							"    else",
+							"    {",
+							"        return false;",
+							"    }",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Ocp-Apim-Subscription-Key",
+						"value": "8630bcf9cf044163ae8a3c961f94ea82",
+						"disabled": true
+					},
+					{
+						"key": "Ocp-Apim-Trace",
+						"value": "true",
+						"disabled": true
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "{{regressionendpoint_spm}}getall/{{dr_id}}",
+					"host": [
+						"{{regressionendpoint_spm}}getall"
+					],
+					"path": [
+						"{{dr_id}}"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
