@@ -1,2 +1,2 @@
-# Postman
+# CRISPPostman
 CRISP Postman Collections
